@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-Qqi5ztVAPnn7MpnP9XKRaB/O/wMedEHYdpA56ZZp+mw='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; manifest-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-EVGXxBfBJAfAoRD1NhaKFz9LEuHDfrTxH8CzCzIxBe8='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; manifest-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta name="format-detection" content="telephone=no">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
@@ -324,7 +324,10 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
     const s = document.createElement("p");
     s.className = "status";
     s.textContent = "🐶 Smooch logrer med halen";
-    setTimeout(() => document.getElementById("question").append(s, a), reduce ? 0 : 800);
+    const q = document.getElementById("question");
+    q.style.touchAction = "auto";
+    document.documentElement.style.scrollSnapType = "none";
+    setTimeout(() => { q.append(s, a); a.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "nearest" }); }, reduce ? 0 : 800);
   });
 })();
 </script>
