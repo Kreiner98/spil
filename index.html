@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="da">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Til Helena</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;700&display=swap">
+<style>
+/* Layout: one game-night board path running down the page; each part of the letter is a space on it, from START to MÅL, ending in a heart-shaped puzzle. Deliberately one light look. */
+:root{
+  --field:#e6f1dd; --tile:#ffffff; --ink:#22302a; --muted:#5b6a61; --shade:#22302a;
+  --red:#e2483d; --blue:#3a7bd8; --yellow:#f2b92f; --green:#4c9f47; --pink:#ec5f86; --path:#c4ad7f;
+  --display:"Fredoka","Nunito",system-ui,sans-serif;
+  --body:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  color-scheme:light;
+}
+html,body{min-height:100%}
+html{scroll-snap-type:y mandatory}
+body{margin:0;background:var(--field);color:var(--ink);font-family:var(--body);font-size:18px;line-height:1.6}
+main{max-width:34rem;margin:0 auto;box-sizing:border-box;
+  padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px));
+  padding-block:0;display:flex;flex-direction:column;gap:0}
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chip{font:600 13px/1 var(--display);letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:#fff;padding:7px 10px;border-radius:6px}
+h1{font:700 clamp(2rem,8vw,2.6rem)/1.1 var(--display);margin:0;text-wrap:balance}
+.board{position:relative;display:flex;flex-direction:column;gap:0}
+.board::before{content:"";position:absolute;left:21px;top:20px;bottom:20px;border-left:5px dotted var(--path)}
+.space{display:grid;grid-template-columns:44px minmax(0,1fr);gap:12px;align-items:start;align-content:center;position:relative;min-height:100svh;box-sizing:border-box;padding-block:24px;scroll-snap-align:start}
+.screen{min-height:100svh;box-sizing:border-box;display:flex;flex-direction:column;justify-content:center;padding-block:24px;scroll-snap-align:start}
+.intro{gap:14px}
+.cue{margin:18px 0 0;color:var(--muted);font:600 16px/1 var(--display);animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(7px)}}
+.anim .space .tile,.anim .question>*{opacity:0;transform:translateY(36px) scale(.97);transition:opacity .6s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+.anim .space .node{transform:scale(0);transition:transform .5s cubic-bezier(.3,1.5,.5,1) .15s}
+.anim .space.in .tile,.anim .question.in>*{opacity:1;transform:none}
+.anim .space.in .node{transform:none}
+.node{width:44px;height:44px;border-radius:50%;background:var(--c);color:var(--c);display:grid;place-items:center;border:3px solid var(--tile);box-shadow:0 3px 0 var(--shade);position:relative;z-index:1}
+.node svg{width:24px;height:24px}
+.tile{background:var(--tile);border:2px solid var(--ink);border-radius:14px;box-shadow:0 4px 0 var(--shade);padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.tile p{margin:0}
+.tag{align-self:flex-start;font:700 12px/1 var(--display);letter-spacing:.1em;color:#fff;background:var(--c);padding:5px 8px;border-radius:5px}
+.spread{position:relative;height:84px}
+.spread .hand,.spread .globe{position:absolute;top:0;font-size:32px;line-height:56px}
+.hand.l{left:0}.hand.r{right:0}
+.globe{left:50%;transform:translateX(-50%)}
+.spread .note{position:absolute;left:0;right:0;bottom:0;text-align:center;color:var(--muted);font-size:14px;line-height:24px}
+.spread.ready .hand.l{left:calc(50% - 1.1em)}
+.spread.ready .hand.r{right:calc(50% - 1.1em)}
+.spread.ready .globe{opacity:0;transform:translateX(-50%) scale(.3)}
+.spread.ready .note{opacity:0}
+.spread.go .hand.l{left:0;transition:left 1.4s cubic-bezier(.3,.7,.2,1) .2s}
+.spread.go .hand.r{right:0;transition:right 1.4s cubic-bezier(.3,.7,.2,1) .2s}
+.spread.go .globe{opacity:1;transform:translateX(-50%) scale(1);transition:opacity .5s ease 1s,transform .6s ease 1s}
+.spread.go .note{opacity:1;transition:opacity .6s ease 1.5s}
+.inv{display:flex;flex-direction:column;gap:6px}
+.inv-label{font:600 12px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.slots{display:flex;gap:6px;flex-wrap:wrap}
+.slot{width:42px;height:42px;display:grid;place-items:center;font-size:22px;background:#f3e3bf;border:2px solid #8a6a3a;border-radius:6px;box-shadow:inset 0 -3px 0 #e2c98f}
+.small{font-size:15px;color:var(--muted)}
+.timeline{list-style:none;margin:0;padding:12px 0 0;border-top:2px dashed var(--path);display:flex;flex-direction:column;gap:6px;font-size:15px;color:var(--muted)}
+.timeline li{display:grid;grid-template-columns:24px minmax(0,1fr);gap:6px}
+.timeline b{color:var(--ink)}
+.bouquet{margin:0;font-size:16px;color:var(--muted);max-width:26rem}
+.status{margin:0;font:600 17px/1.4 var(--display);color:var(--green)}
+.me{display:block;width:min(100%,340px);height:auto}
+.so{font:700 44px/1 var(--display)}
+.names{font:600 20px/1.4 var(--display)}
+.finish{--sq:12px;border:2px solid var(--ink);border-radius:12px;overflow:hidden;background:var(--tile)}
+.finish::before,.finish::after{content:"";display:block;height:calc(var(--sq) * 2);
+  background:repeating-conic-gradient(var(--ink) 0 25%, var(--tile) 0 50%) 0 0/calc(var(--sq) * 2) calc(var(--sq) * 2)}
+.finish p{margin:0;padding:14px 12px;text-align:center;font:700 clamp(1.8rem,7.5vw,2.3rem)/1.15 var(--display);color:var(--red)}
+.question{display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center;touch-action:none}
+.question h2{font:700 clamp(1.7rem,7vw,2.1rem)/1.15 var(--display);margin:0;text-wrap:balance}
+.social{width:min(100%,22rem);box-sizing:border-box;background:var(--tile);border:2px solid var(--ink);border-radius:14px;box-shadow:0 4px 0 var(--shade);padding:14px 16px;display:flex;flex-direction:column;gap:10px;text-align:left}
+.who{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.name{font:700 22px/1 var(--display)}
+.rel{font:600 16px/1 var(--display);color:var(--muted)}
+.rel s{opacity:.7}
+.rel b{color:var(--pink)}
+.hearts{display:grid;grid-template-columns:repeat(10,minmax(0,26px));gap:4px}
+.h{display:block;width:100%;aspect-ratio:1}
+.h svg{width:100%;height:100%;display:block}
+.h path{fill:var(--pink);stroke:var(--ink);stroke-width:1.8}
+.h.locked path{fill:#d9d6cf;stroke:#9a978f}
+.h.open path{fill:var(--tile)}
+.h.pop{animation:pop .5s ease}
+@keyframes pop{50%{transform:scale(1.4)}}
+.choices{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;min-height:60px;align-items:center}
+button{font:700 20px/1 var(--display);border:2px solid var(--ink);border-radius:12px;padding:14px 30px;cursor:pointer;touch-action:manipulation;box-shadow:0 4px 0 var(--shade);color:var(--ink)}
+button:active{transform:translateY(3px);box-shadow:0 1px 0 var(--shade)}
+button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+#yes{background:var(--pink);color:#fff;transition:transform .25s ease}
+#yes[disabled]{cursor:default}
+#no{background:var(--tile);transition:left .25s ease,top .25s ease,transform .25s ease}
+#no.loose{position:fixed;z-index:5}
+.hint{font-size:14px;color:var(--muted);margin:0}
+.hint:empty{display:none}
+.answer{margin:0;font-size:18px;white-space:pre-line}
+@media (prefers-reduced-motion:reduce){#yes,#no,.spread *{transition:none!important}.h.pop{animation:none}.cue{animation:none}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-die" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4" fill="#fff"/><circle cx="8.5" cy="8.5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.7" fill="currentColor"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20 C 6 15, 3 12, 3 8.5 C 3 6, 5 4, 7.5 4 C 9.5 4, 11 5.2, 12 7 C 13 5.2, 14.5 4, 16.5 4 C 19 4, 21 6, 21 8.5 C 21 12, 18 15, 12 20 Z" fill="#fff"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><polygon points="12,3 14.6,9 21,9.3 16,13.4 17.7,20 12,16.4 6.3,20 8,13.4 3,9.3 9.4,9" fill="#fff"/></symbol>
+    <symbol id="i-puzzle" viewBox="0 0 24 24"><path d="M5 8 h4 a2.2 2.2 0 1 1 4 0 h4 v4 a2.2 2.2 0 1 1 0 4 v4 H5 Z" fill="#fff"/></symbol>
+    <symbol id="i-sprout" viewBox="0 0 24 24"><path d="M12 21 V11" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><path d="M12 13 C 12 8, 8 6, 4 7 C 4 11, 8 13, 12 13 Z M12 11 C 12 6, 16 4, 20 5 C 20 9, 16 11, 12 11 Z" fill="#fff"/></symbol>
+    <symbol id="i-flag" viewBox="0 0 24 24"><path d="M6 3 V21" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/><rect x="7" y="4" width="12" height="8" fill="#fff"/><rect x="7" y="4" width="3" height="4" fill="currentColor"/><rect x="13" y="4" width="3" height="4" fill="currentColor"/><rect x="10" y="8" width="3" height="4" fill="currentColor"/><rect x="16" y="8" width="3" height="4" fill="currentColor"/></symbol>
+  </defs>
+</svg>
+
+<main>
+  <div class="screen intro">
+    <div class="top"><span class="chip">2 spillere</span><span class="chip" style="background:var(--green)">🌱 Co-op</span></div>
+    <h1>Kære Helena,</h1>
+    <p class="cue" aria-hidden="true">Scroll ned ↓</p>
+  </div>
+
+  <div class="board">
+    <section class="space" style="--c:var(--blue)">
+      <span class="node" aria-hidden="true"><svg><use href="#i-die"/></svg></span>
+      <div class="tile">
+        <span class="tag">START</span>
+        <p>Hey baby, you know I love you, right? 👀</p>
+        <p>Jeg har tænkt meget over, hvordan jeg skulle gøre det her, og jeg har haft lyst til at gøre det længe ❤️❤️❤️</p>
+      </div>
+    </section>
+
+    <section class="space" style="--c:var(--pink)">
+      <span class="node" aria-hidden="true"><svg><use href="#i-heart"/></svg></span>
+      <div class="tile">
+        <p>Jeg elsker dig SÅ meget,</p>
+        <div class="spread" id="spread" role="img" aria-label="To hænder, der spreder sig hele vejen rundt om jorden">
+          <span class="hand l">🫷</span><span class="globe">🌍</span><span class="hand r">🫸</span>
+          <span class="note">← hele vejen rundt om jorden →</span>
+        </div>
+        <p>og meget mere endnu. Det er ubeskriveligt.</p>
+      </div>
+    </section>
+
+    <section class="space" style="--c:var(--yellow)">
+      <span class="node" aria-hidden="true"><svg><use href="#i-star"/></svg></span>
+      <div class="tile">
+        <p>You make me feel like the happiest man alive. You make me wanna do better. You bring out the best in me.</p>
+      </div>
+    </section>
+
+    <section class="space" style="--c:var(--blue)">
+      <span class="node" aria-hidden="true"><svg><use href="#i-puzzle"/></svg></span>
+      <div class="tile">
+        <p>I love every moment we spend together, from strolling through IKEA, putting together a 1000-piece puzzle (over 2 dage!) and seeing you absolutely kill it behind the wheel in Shelly 🏎️, to spending a Friday night on the couch playing Stardew Valley and having SO MUCH FUN… I could go on forever 😍😍😍</p>
+        <div class="inv">
+          <span class="inv-label">Inventar</span>
+          <div class="slots">
+            <span class="slot" title="IKEA-tur">🛒</span><span class="slot" title="1000 brikker">🧩</span><span class="slot" title="Shelly">🏎️</span><span class="slot" title="Sofa-fredag">🛋️</span><span class="slot" title="Stardew Valley">🎮</span><span class="slot" title="Smooch">🐶</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="space" style="--c:var(--green)">
+      <span class="node" aria-hidden="true"><svg><use href="#i-sprout"/></svg></span>
+      <div class="tile">
+        <p>Ever since our first date, you've been on my mind all the time. Like, ALL the time.</p>
+        <p>The number of times Marc has caught me daydreaming about you while he and I were having a conversation is countless.</p>
+        <ul class="timeline">
+          <li><span>📍</span><span><b>9. juni:</b> Første date, Bootleggers Frederiksberg</span></li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="space" style="--c:var(--pink)">
+      <span class="node" aria-hidden="true"><svg><use href="#i-heart"/></svg></span>
+      <div class="tile">
+        <p>I guess what I'm trying to say… or write, since I'm probably tearing up a little right now. Because that's who I am: emotional. I feel deeply, and it shows.</p>
+        <p>You've become my first thought when I wake up and my last thought before I go to bed. Both put the biggest, most stupid golden retriever smile on my face.</p>
+        <svg class="me" viewBox="0 0 400 190" role="img" aria-label="En smilende golden retriever med en pil og teksten Me, og en mindre brun hund med en pil og teksten Smooch">
+          <defs>
+            <g id="dog" stroke="#22302a" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M60 66 C 60 36, 140 36, 140 66 C 146 98, 135 134, 100 137 C 65 134, 54 98, 60 66 Z" style="fill:var(--fur)"/>
+              <path d="M64 56 C 42 54, 34 88, 42 112 C 51 121, 62 108, 64 90 Z" style="fill:var(--ear)"/>
+              <path d="M136 56 C 158 54, 166 88, 158 112 C 149 121, 138 108, 136 90 Z" style="fill:var(--ear)"/>
+              <path d="M77 80 q 7 -9 14 0 M109 80 q 7 -9 14 0" fill="none"/>
+              <ellipse cx="100" cy="108" rx="25" ry="18" style="fill:var(--muz)"/>
+              <path d="M82 112 Q 100 141 118 112 Q 100 119 82 112 Z" fill="#7a2633"/>
+              <path d="M93 121 Q 100 137 107 121 Q 100 117 93 121 Z" fill="#ef8a93" stroke-width="2"/>
+              <path d="M92 97 q 8 -5 16 0 q -2 8 -8 9 q -6 -1 -8 -9 Z" fill="#22302a"/>
+              <circle cx="72" cy="98" r="6" fill="#ef8a93" opacity=".45" stroke="none"/><circle cx="128" cy="98" r="6" fill="#ef8a93" opacity=".45" stroke="none"/>
+            </g>
+          </defs>
+          <use href="#dog" transform="translate(70 18) scale(1.15)" style="--fur:#e6b45c;--ear:#cf9640;--muz:#f6dcae"/>
+          <use href="#dog" transform="translate(285 94) scale(.6)" style="--fur:#8b5a32;--ear:#653f21;--muz:#c99a6e"/>
+          <g stroke="#22302a" stroke-width="2.6" stroke-linecap="round" fill="none">
+            <path d="M86 46 C 100 50, 115 58, 128 72"/>
+            <path d="M128 72 l -12 -3 M128 72 l -2 -12"/>
+            <path d="M318 80 C 322 95, 332 104, 344 112"/>
+            <path d="M344 112 l -12 -2 M344 112 l -3 -12"/>
+          </g>
+          <text x="36" y="48" font-family="Fredoka, sans-serif" font-size="32" font-weight="700" fill="#22302a">Me</text>
+          <text x="262" y="70" font-family="Fredoka, sans-serif" font-size="28" font-weight="700" fill="#22302a">Smooch</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="space" style="--c:var(--red)">
+      <span class="node" aria-hidden="true"><svg><use href="#i-flag"/></svg></span>
+      <div class="tile">
+        <span class="tag">MÅL</span>
+        <p>Jeg elsker dig, min skat, og jeg ville elske at være en del af dit liv, for good.</p>
+        <p class="so">SÅ…</p>
+        <p class="names">Helena Krarup Abrams. Baby. Skat. Principessa.</p>
+        <div class="finish"><p>JEG ELSKER DIG<br>I LOVE YOU</p></div>
+      </div>
+    </section>
+  </div>
+
+  <div class="question screen" id="question">
+    <p class="bouquet">I Stardew giver man en buket til den, man gerne vil være kæreste med. Så her er min: 💐</p>
+    <div class="social" aria-live="polite">
+      <div class="who"><span class="name">Helena</span><span class="rel" id="rel">single</span></div>
+      <div class="hearts" id="hearts" role="img" aria-label="8 hjerter, 2 låste"></div>
+    </div>
+    <h2>Vil du være min kæreste?</h2>
+    <div class="choices">
+      <button id="yes" type="button">Ja</button>
+      <button id="no" type="button">Nej</button>
+    </div>
+    <p class="hint" id="hint"></p>
+  </div>
+</main>
+
+<script>
+(() => {
+  try { if ("scrollRestoration" in history) history.scrollRestoration = "manual"; } catch (_) {}
+  const toTop = () => scrollTo(0, 0);
+  toTop();
+  addEventListener("load", toTop);
+  addEventListener("pageshow", toTop);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const sp = document.getElementById("spread");
+  if (!reduce && "IntersectionObserver" in window) {
+    sp.classList.add("ready");
+    let goTimer;
+    const io = new IntersectionObserver(es => {
+      clearTimeout(goTimer);
+      if (es[0].isIntersecting) goTimer = setTimeout(() => sp.classList.add("go"), 500);
+      else sp.classList.remove("go");
+    }, { threshold: .8 });
+    io.observe(sp);
+  }
+  if (!reduce && "IntersectionObserver" in window) {
+    document.body.classList.add("anim");
+    const io2 = new IntersectionObserver(es => es.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add("in"); io2.unobserve(e.target); }
+    }), { threshold: .35 });
+    document.querySelectorAll(".space, .question").forEach(el => io2.observe(el));
+  }
+
+  const heartsEl = document.getElementById("hearts");
+  const hs = [...Array(10)].map((_, i) => {
+    const s = document.createElement("span");
+    s.className = "h" + (i >= 8 ? " locked" : "");
+    s.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20 C 6 15, 3 12, 3 8.5 C 3 6, 5 4, 7.5 4 C 9.5 4, 11 5.2, 12 7 C 13 5.2, 14.5 4, 16.5 4 C 19 4, 21 6, 21 8.5 C 21 12, 18 15, 12 20 Z"/></svg>';
+    heartsEl.append(s);
+    return s;
+  });
+  const yes = document.getElementById("yes"), no = document.getElementById("no"), hint = document.getElementById("hint");
+  const lines = ["Er du sikker?", "Prøv igen", "Næ næ", "Forkert felt", "Den er vist i stykker", "Ja er lige der", "Nej er udsolgt", "Game over for Nej"];
+  let dodges = 0, lastDodge = 0, lastX = innerWidth / 2, lastY = innerHeight / 2;
+
+  function dodge(px, py) {
+    const now = performance.now();
+    if (now - lastDodge < 700) return;
+    lastDodge = now;
+    if (px != null) { lastX = px; lastY = py; }
+    const b = no.getBoundingClientRect(), pad = 16;
+    const maxX = innerWidth - b.width - pad, maxY = innerHeight - b.height - pad;
+    let best = null, bestD = -1;
+    for (let i = 0; i < 12; i++) {
+      const x = pad + Math.random() * Math.max(0, maxX - pad), y = pad + Math.random() * Math.max(0, maxY - pad);
+      const d = Math.hypot(x + b.width / 2 - lastX, y + b.height / 2 - lastY);
+      if (d > bestD) { bestD = d; best = [x, y]; }
+    }
+    if (!no.classList.contains("loose")) { no.style.left = b.left + "px"; no.style.top = b.top + "px"; no.classList.add("loose"); document.body.append(no); no.getBoundingClientRect(); }
+    no.style.left = best[0] + "px"; no.style.top = best[1] + "px";
+    dodges++;
+    try { navigator.vibrate && navigator.vibrate(30); } catch (_) {}
+    no.textContent = lines[(dodges - 1) % lines.length];
+    no.style.transform = `rotate(${(Math.random() * 8 - 4).toFixed(1)}deg) scale(${Math.max(.7, 1 - dodges * .04)})`;
+    yes.style.transform = `scale(${Math.min(1.5, 1 + dodges * .07)})`;
+  }
+
+  addEventListener("pointermove", e => {
+    if (!no.isConnected) return;
+    const b = no.getBoundingClientRect();
+    const cx = b.left + b.width / 2, cy = b.top + b.height / 2;
+    if (Math.hypot(e.clientX - cx, e.clientY - cy) < Math.max(b.width, b.height) * .9) dodge(e.clientX, e.clientY);
+  });
+  no.addEventListener("pointerdown", e => { e.preventDefault(); dodge(e.clientX, e.clientY); });
+  no.addEventListener("click", e => { e.preventDefault(); dodge(); });
+
+  yes.addEventListener("click", () => {
+    if (yes.disabled) return;
+    try { navigator.vibrate && navigator.vibrate([60, 40, 60, 40, 120]); } catch (_) {}
+    yes.disabled = true;
+    yes.style.transform = "";
+    yes.textContent = "Ja ❤️";
+    no.remove();
+    hint.textContent = "";
+    document.getElementById("rel").innerHTML = "<s>single</s> → <b>girlfriend</b> 💕";
+    heartsEl.setAttribute("aria-label", "8 hjerter, 2 låst op");
+    hs.slice(8).forEach((h, k) => setTimeout(() => { h.classList.remove("locked"); h.classList.add("open", "pop"); }, reduce ? 0 : 400 + k * 300));
+    const a = document.createElement("p");
+    a.className = "answer";
+    a.textContent = "Jeg glæder mig ubeskriveligt meget til vores første date som KÆRESTER 🥰🥰🥰\nTil at tage til Sverige SOM KÆRESTER 🥰🥰🥰\nOg til at holde Thanksgiving som KÆRESTER 🦃🦃🦃❤️❤️\n(Not in the kitchen 👀)\nI love you my love ❤️";
+    const s = document.createElement("p");
+    s.className = "status";
+    s.textContent = "🐶 Smooch logrer med halen";
+    setTimeout(() => document.getElementById("question").append(s, a), reduce ? 0 : 800);
+  });
+})();
+</script>
+</body>
+</html>
