@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-BlyELXPYP/hcQgrX6I7oWvDk0d61H+Q13jD0lHu0G28='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; manifest-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'sha256-R+iORIkCf1MpvHmAZHBW1OodGSEzlFYbWBiBcqPnkqI='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; manifest-src 'none'; connect-src 'none'; base-uri 'none'; form-action 'none'; upgrade-insecure-requests">
 <meta name="referrer" content="no-referrer">
 <meta name="format-detection" content="telephone=no">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet, noimageindex, notranslate">
@@ -44,15 +44,36 @@ h1{font:700 clamp(2rem,8vw,2.6rem)/1.1 var(--display);margin:0;text-wrap:balance
 .tile{background:var(--tile);border:2px solid var(--ink);border-radius:14px;box-shadow:0 4px 0 var(--shade);padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0}
 .tile p{margin:0}
 .tag{align-self:flex-start;font:700 12px/1 var(--display);letter-spacing:.1em;color:#fff;background:var(--c);padding:5px 8px;border-radius:5px}
-.spread{display:flex;flex-direction:column;align-items:center;gap:2px}
-.spread svg{display:block;width:100%;height:auto;overflow:visible}
-.spread .arm{fill:none;stroke:var(--ink);stroke-width:9;stroke-linecap:round}
-.spread .arm-in{fill:none;stroke:#f6dcae;stroke-width:4.5;stroke-linecap:round}
-.spread .palm{fill:#f6dcae;stroke:var(--ink);stroke-width:2.6}
-.spread .globe{font-size:112px;transform-origin:160px 74px;transition:opacity .5s ease,transform .6s cubic-bezier(.3,1.4,.5,1)}
-.spread.hide-globe .globe{opacity:0;transform:scale(.35)}
-.spread .note{text-align:center;color:var(--muted);font-size:14px;line-height:24px;transition:opacity .6s ease}
-.spread.hide-note .note{opacity:0}
+.spread{display:flex;flex-direction:column;gap:4px}
+.spread .stage{position:relative;height:76px}
+.spread .hand,.spread .globe,.spread .spark{position:absolute;line-height:1;text-align:center}
+.spread .hand{top:14px;font-size:40px;width:1.2em;margin-left:-.6em}
+.spread .to-l{left:.6em;z-index:2}
+.spread .to-r{left:calc(100% - .6em);z-index:1}
+.spread .globe{left:50%;top:4px;font-size:56px;width:1.2em;margin-left:-.6em}
+.spread .spark{top:0;font-size:18px;opacity:0}
+.spread .spark.l{left:4px}.spread .spark.r{right:4px}
+.spread .note{text-align:center;color:var(--muted);font-size:14px;line-height:24px}
+.spread.cross .to-l{left:calc(50% + 2px);transform:rotate(-38deg)}
+.spread.cross .to-r{left:calc(50% - 2px);transform:rotate(38deg)}
+.spread.cross .globe{opacity:0;transform:scale(.2)}
+.spread.cross .note{opacity:0}
+.spread.go .to-l{animation:flingL 1.15s cubic-bezier(.25,.8,.3,1) .45s both}
+.spread.go .to-r{animation:flingR 1.15s cubic-bezier(.25,.8,.3,1) .45s both}
+.spread.go .globe{animation:globeIn .7s cubic-bezier(.3,1.5,.5,1) .95s both}
+.spread.go .spark{animation:spark .9s ease-out 1.45s both}
+.spread.go .note{animation:fadeIn .6s ease 1.6s both}
+@keyframes flingL{0%{left:calc(50% + 2px);transform:rotate(-38deg)}
+  18%{left:calc(50% + 4px);transform:rotate(-46deg) scale(1.1)}
+  60%{transform:translateY(-12px) rotate(10deg)}
+  100%{left:.6em;transform:none}}
+@keyframes flingR{0%{left:calc(50% - 2px);transform:rotate(38deg)}
+  18%{left:calc(50% - 4px);transform:rotate(46deg) scale(1.1)}
+  60%{transform:translateY(-12px) rotate(-10deg)}
+  100%{left:calc(100% - .6em);transform:none}}
+@keyframes globeIn{0%{opacity:0;transform:scale(.2) rotate(-120deg)}100%{opacity:1;transform:none}}
+@keyframes spark{0%{opacity:0;transform:scale(.3)}40%{opacity:1;transform:scale(1.2)}100%{opacity:0;transform:scale(1) translateY(-6px)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .inv{display:flex;flex-direction:column;gap:6px}
 .inv-label{font:600 12px/1 var(--display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .slots{display:flex;gap:6px;flex-wrap:wrap}
@@ -134,19 +155,12 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
       <span class="node" aria-hidden="true"><svg><use href="#i-heart"/></svg></span>
       <div class="tile">
         <p>Jeg elsker dig SÅ meget,</p>
-        <div class="spread" id="spread" role="img" aria-label="En figur, der krydser armene og så spreder dem ud hele vejen rundt om jorden">
-          <svg viewBox="0 0 320 150" aria-hidden="true">
-            <text class="globe" x="160" y="78" text-anchor="middle" dominant-baseline="central">🌍</text>
-            <g stroke="#22302a" stroke-width="2.6" stroke-linejoin="round">
-              <rect x="143" y="62" width="34" height="58" rx="15" fill="var(--blue)"/>
-              <circle cx="160" cy="44" r="15" fill="#f6dcae"/>
-            </g>
-            <path d="M154 46 q6 5 12 0" fill="none" stroke="#22302a" stroke-width="2.2" stroke-linecap="round"/>
-            <circle cx="154.5" cy="40" r="1.8" fill="#22302a"/><circle cx="165.5" cy="40" r="1.8" fill="#22302a"/>
-            <path class="arm" id="armL"/><path class="arm-in" id="armLi"/>
-            <path class="arm" id="armR"/><path class="arm-in" id="armRi"/>
-            <circle class="palm" id="handL" r="8"/><circle class="palm" id="handR" r="8"/>
-          </svg>
+        <div class="spread" id="spread" role="img" aria-label="To hænder, der krydses og så spredes ud hele vejen rundt om jorden">
+          <div class="stage" aria-hidden="true">
+            <span class="globe">🌍</span>
+            <span class="hand to-r">🫸</span><span class="hand to-l">🫷</span>
+            <span class="spark l">✨</span><span class="spark r">✨</span>
+          </div>
           <span class="note">← hele vejen rundt om jorden →</span>
         </div>
         <p>og meget mere endnu. Det er ubeskriveligt.</p>
@@ -253,51 +267,16 @@ button:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
   addEventListener("pageshow", toTop);
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const sp = document.getElementById("spread");
-  const arm = id => document.getElementById(id);
-  const SL = [146, 72], SR = [174, 72];                 // shoulders
-  const CROSS_L = [192, 80], CROSS_R = [128, 80];       // hands crossed over the chest
-  const OPEN_L = [12, 62], OPEN_R = [308, 62];          // hands out to the sides
-  const lerp = (a, b, t) => a + (b - a) * t;
-  function pose(t) {
-    // the hands sweep out in an arc that lifts a little mid-fling; the elbow bend straightens as the arms open
-    const lift = Math.sin(Math.PI * t) * -22;
-    [[SL, CROSS_L, OPEN_L, "L", 1], [SR, CROSS_R, OPEN_R, "R", -1]].forEach(([S, C, O, k, side]) => {
-      const hx = lerp(C[0], O[0], t), hy = lerp(C[1], O[1], t) + lift;
-      const bend = (1 - t) * 34;
-      const ex = (S[0] + hx) / 2 - side * bend * 0.15, ey = (S[1] + hy) / 2 + bend;
-      const d = `M${S[0]} ${S[1]} Q${ex.toFixed(1)} ${ey.toFixed(1)} ${hx.toFixed(1)} ${hy.toFixed(1)}`;
-      arm("arm" + k).setAttribute("d", d); arm("arm" + k + "i").setAttribute("d", d);
-      arm("hand" + k).setAttribute("cx", hx.toFixed(1)); arm("hand" + k).setAttribute("cy", hy.toFixed(1));
-    });
-  }
-  // arms cross in front of the chest, the left arm drawn over the right like a real cross
-  const svg = sp.querySelector("svg");
-  svg.append(arm("armR"), arm("armRi"), arm("handR"), arm("armL"), arm("armLi"), arm("handL"));
-  const easeOut = t => 1 - Math.pow(1 - t, 3);
-  let raf = 0, goTimer;
-  function play() {
-    cancelAnimationFrame(raf);
-    sp.classList.add("hide-globe", "hide-note");
-    pose(0);
-    const start = performance.now() + 450, dur = 1300;  // hold the crossed pose briefly, then fling open
-    const step = now => {
-      const t = Math.min(1, Math.max(0, (now - start) / dur));
-      pose(easeOut(t));
-      if (t > .45) sp.classList.remove("hide-globe");
-      if (t >= 1) { sp.classList.remove("hide-note"); return; }
-      raf = requestAnimationFrame(step);
-    };
-    raf = requestAnimationFrame(step);
-  }
   if (!reduce && "IntersectionObserver" in window) {
-    pose(0); sp.classList.add("hide-globe", "hide-note");
+    sp.classList.add("cross");
+    let goTimer;
     const io = new IntersectionObserver(es => {
       clearTimeout(goTimer);
-      if (es[0].isIntersecting) goTimer = setTimeout(play, 300);
-      else { cancelAnimationFrame(raf); pose(0); sp.classList.add("hide-globe", "hide-note"); }
+      if (es[0].isIntersecting) goTimer = setTimeout(() => sp.classList.add("go"), 200);
+      else sp.classList.remove("go");
     }, { threshold: .8 });
     io.observe(sp);
-  } else pose(1);
+  }
   if (!reduce && "IntersectionObserver" in window) {
     document.body.classList.add("anim");
     const io2 = new IntersectionObserver(es => es.forEach(e => {
